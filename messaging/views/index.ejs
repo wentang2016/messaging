@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="UTF-8" />
+		<title>Sweet Home</title>
+		<link rel='stylesheet' href='/stylesheets/style.css' />
+		<script src="/javascripts/jquery-2.1.1.js"></script>
+		<script src="/socket.io/socket.io.js"></script>
+		<script>
+			var chat_history;
+			var roomNum=0;
+			var socket = io.connect(location.origin);
+
+			socket.on('connect', function() {
+				socket.on('message', function(data) {
+					//console.log('receive ', data);
+					chat_history.append(JSON.stringify(data)+'<br />');
+				});
+
+			});
+
+
+
+			$(function() {
+				chat_history = $('#chat_history');
+				var content = $('#content');
+				$('#send').click('click', function() {
+					socket.emit('message', content.val());
+					content.val('');
+				});
+
+				$('.friends li').click(function() {
+					chat_history.append($(this).text()+' joined! <br />');
+					socket.emit('create_group',{requestor:'wentang',friends:[$(this).text()],roomNum:roomNum});
+					roomNum++;
+				});
+				
+				socket.on('put_id',function(id){
+					$('body').data('group_id',id);
+					console.log('group_id',id);
+				});
+
+			});
+
+		</script>
+	</head>
+	<body>
+		<h1 style="text-align:center;">Welcome to Sweet Home</h1>
+
+		<article class="main">
+			<section class="left">
+				<div >
+					<ul class="no_style_plain friends">
+						<li>
+							wen1
+						</li>
+						<li>
+							wen2
+						</li>
+						<li>
+							wen3
+						</li>
+						<li>
+							wen4
+						</li>
+					</ul>
+				</div>
+				<div id="chat_history"></div>
+				<div>
+					<textarea id="content"></textarea>
+					<div class="tool_bar">
+						<button id="send">
+							Send
+						</button>
+					</div>
+				</div>
+
+			</section>
+
+			<section class="right">
+				<nav>
+					<ul class="no_style">
+						<li>
+							Chapter 1
+						</li>
+						<li>
+							Chapter 2
+						</li>
+						<li>
+							Chapter 3
+						</li>
+						<li>
+							Chapter 4
+						</li>
+					</ul>
+
+				</nav>
+				<div>
+					<!--
+					<ul>
+
+					<% for(var i=0;i<books.length;i++){ %>
+					<li><%=books[i]%></li>
+					<%}%>
+					</ul>
+					-->
+				</div>
+			</section>
+		</article>
+		<div>
+			dodod
+		</div>
+	</body>
+</html>

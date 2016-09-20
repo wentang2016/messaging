@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="zh">
+	<head>
+		<meta charset="utf-8" />
+		<title></title>
+		<script>
+			var httpObj = null;
+			try {
+				httpObj = new XMLHttpRequest();
+			} catch(err) {
+				console.err('httpObj:', err);
+			}
+
+			function login_callback() {
+				if (httpObj.readyState == 4 && httpObj.statusText == "OK") {
+					var data = JSON.parse(httpObj.response);
+					if (data.success ==0 )
+						error.innerHTML = 'user name or password is wrong';
+					else if(data.success==1) location.href=location.origin+'/index';
+				}
+			}
+
+
+			window.onload = function() {
+
+				var sb = document.getElementById('submit');
+				var username = document.getElementById('username');
+				var password = document.getElementById('password');
+				var error = document.getElementById('error');
+
+				if (httpObj != null)
+					httpObj.onreadystatechange = login_callback;
+					
+				username.onfocus=function(){error.innerHTML='';};
+				password.onfocus=function(){error.innerHTML='';};	
+				sb.onclick = function() {
+					var user = {};
+					user.username = username.value;
+					user.password = password.value;
+					if (httpObj == null)
+						return;
+					httpObj.open('post', '/login');
+					httpObj.setRequestHeader('Content-Type', 'application/json');
+					httpObj.send(JSON.stringify(user));
+					
+
+				};
+
+			};
+
+		</script>
+	</head>
+	<body>
+		<form method="post" action="/login">
+			
+			<label>Username:
+				<input type="text" name="username" id="username" />
+			</label>
+			<br />
+			<label>Password:
+				<input type="password" name="password" id="password"/>
+			</label>
+			<button id="submit1" type="submit">
+				submit
+			</button>
+		</form>
+		<div><%=error%></div>
+		<div id="error"></div>
+	</body>
+</html>
